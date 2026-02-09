@@ -1,0 +1,92 @@
+/* ===== IMPORT FOMANTIC UI ===== */
+@import "../../node_modules/fomantic-ui/dist/semantic.min.css";
+
+/* ===== GLOBAL ===== */
+body {
+    /* background: #1b1c1d; */
+    color: #f8f8f8;
+    font-family: "Lato", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== NAVBAR ===== */
+.ui.top.fixed.menu {
+    height: 50px; /* default, JS akan override otomatis */
+    z-index: 3000 !important; /* navbar selalu di atas */
+}
+
+/* ===== PUSHABLE CONTEXT ===== */
+.ui.pushable {
+    overflow-x: hidden;
+    transition: margin-top 0.3s ease;
+    margin-top: var(--navbar-height, 50px) !important; /* fallback 50px */
+}
+
+/* ===== SIDEBAR ===== */
+.ui.left.sidebar {
+    top: var(--navbar-height, 50px);
+    height: calc(100vh - var(--navbar-height, 50px));
+    width: 260px;
+    z-index: 2000 !important;
+    background: #111 !important;
+    transform: translateX(-260px);
+    transition: transform 0.3s ease;
+}
+
+/* Sidebar scrollbar untuk mobile */
+.ui.left.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.ui.left.sidebar::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 3px;
+}
+
+/* ===== PUSHER ===== */
+.ui.pushable > .pusher {
+    min-height: 100vh; /* JS akan kurangi navbar height */
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+/* Hilangkan overlay gelap Fomantic default */
+.ui.pushable > .pusher:after {
+    background: transparent !important;
+    pointer-events: none !important;
+}
+
+/* ===== DROPDOWN ===== */
+.ui.dropdown .menu {
+    background: #111 !important;
+    border: 1px solid #333 !important;
+}
+
+/* ===== ICON MENU ===== */
+#sidebar-toggle {
+    cursor: pointer;
+}
+
+/* ===== ACCORDION MENU ===== */
+.ui.accordion .title {
+    cursor: pointer;
+}
+.ui.accordion .content {
+    padding-left: 1.5rem !important;
+}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 991px) {
+    .ui.top.fixed.menu {
+        height: 60px; /* navbar lebih tinggi di mobile */
+    }
+    .ui.pushable {
+        margin-top: var(--navbar-height, 50px) !important;
+    }
+    .ui.left.sidebar {
+        top: var(--navbar-height, 60px);
+        height: calc(100vh - var(--navbar-height, 60px));
+        transform: translateX(-260px);
+        z-index: 2500 !important;
+    }
+}

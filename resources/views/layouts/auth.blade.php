@@ -24,26 +24,28 @@
     @include('layouts.partials.navbar')
 
     {{-- ===== PUSHABLE CONTEXT ===== --}}
-    <div class="ui pushable">
+    <div class="ui pushable" id="sidebar-context">
 
         {{-- SIDEBAR --}}
         @include('layouts.partials.sidebar')
-        {{-- ===== STICKY HEADER (GLOBAL, SETELAH LOGIN) ===== --}}
-        @include('layouts.partials.sticky')
+
         {{-- PUSHER --}}
         <div class="pusher">
+            
+            {{-- ===== STICKY HEADER (GLOBAL, SETELAH LOGIN) ===== --}}
+            @include('layouts.partials.sticky')
             @yield('main-content')
         </div>
 
     </div>
-<script>
-$(function () {
+    <script>
+        $(function () {
     $('#page-sticky').sticky({
         context: '.pusher',
-        offset: $('.ui.top.fixed.menu').outerHeight() || 0
+        offset: $('.ui.top.fixed.menu').outerHeight()
     });
 });
-</script>
+    </script>
 </body>
 
 </html>

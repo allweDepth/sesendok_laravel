@@ -19,13 +19,11 @@
         </button>
     </div>
 
-    <div id="renstra-table-container" class="ui long scrolling fluid container mt-4">
-        <!-- Loading -->
-        <div class="ui active inverted dimmer" id="renstra-loading">
+    <div id="renstra-table-container" class="ui segment">
+        <div class="ui inverted dimmer" id="renstra-loading">
             <div class="ui large text loader">Memuat data RENSTRA...</div>
         </div>
 
-        <!-- Konten tabel -->
         <div id="renstra-table-content"></div>
     </div>
 </div>
@@ -90,7 +88,7 @@
 
 @push('scripts')
 <script>
-$(function() {
+    $(function() {
     console.log("Script RENSTRA start");
 
     const container = $('#renstra-table-container');

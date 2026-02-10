@@ -39,11 +39,11 @@ class AnggaranController extends Controller
 
                 $items = $query->paginate($perPage, ['*'], 'page', $page);
 
-                // Buat variabel pagination dulu
+                // Tambah baris ini
                 $pagination = $items->links('vendor.pagination.semantic-ui')->toHtml();
 
                 $data = [
-                    'html'       => view('anggaran.partials._table_renstra', compact('items', 'pagination'))->render(),  // TAMBAH 'pagination' di compact
+                    'html'       => view('anggaran.partials._table_renstra', compact('items', 'pagination'))->render(),
                     'pagination' => $pagination,
                     'total'      => number_format($query->sum('jumlah'), 2, ',', '.'),
                 ];

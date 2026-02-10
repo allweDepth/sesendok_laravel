@@ -49,37 +49,43 @@
                 <textarea name="uraian_prog_keg" rows="3" required></textarea>
             </div>
 
-            <div class="fields">
-                <div class="eight wide field">
+            <div class="two fields">
+                <div class="field">
                     <label>Satuan</label>
                     <input type="text" name="satuan" placeholder="Contoh: Km, Unit, Persen">
                 </div>
-                <div class="eight wide field">
+                <div class="field">
                     <label>Jumlah (Rp)</label>
                     <input type="number" name="jumlah" step="1" min="0" required>
                 </div>
             </div>
 
-            <!-- Field tambahan sesuai tabel renstra_skpd_neo -->
-            <div class="fields">
-                <div class="eight wide field">
+            <!-- Field tambahan sesuai tabel -->
+            <div class="two fields">
+                <div class="field">
                     <label>Indikator Kinerja</label>
                     <input type="text" name="indikator">
                 </div>
-                <div class="eight wide field">
+                <div class="field">
                     <label>Data Capaian Awal</label>
                     <input type="number" name="data_capaian_awal" step="0.01" value="0.00">
                 </div>
             </div>
 
-            <!-- Target & Dana per tahun (bisa ditambah sesuai kebutuhan) -->
             <div class="field">
                 <label>Kondisi Akhir Renstra</label>
                 <input type="number" name="kondisi_akhir" step="0.01" value="0.00">
             </div>
 
-            <button type="submit" class="ui positive button">Simpan</button>
-            <button type="button" class="ui button" id="btn-batal-modal">Batal</button>
+            <div class="ui error message" style="display:none;">
+                <div class="header">Mohon periksa kembali isian form</div>
+                <ul class="list"></ul>
+            </div>
+
+            <div class="ui buttons">
+                <button type="submit" class="ui positive button">Simpan</button>
+                <button type="button" class="ui button" id="btn-batal-modal">Batal</button>
+            </div>
         </form>
     </div>
 </div>
@@ -93,17 +99,17 @@ $(function() {
     const loading   = $('#renstra-loading');
 
     function loadRenstraTable(page = 1) {
-        loading.show(); // tampilkan loading
-        content.empty(); // kosongkan isi sebelumnya
+        loading.show();
+        content.empty();
 
         $.ajax({
             url: '{{ route("anggaran.renstra.table") }}',
             data: { page: page },
             success: function(res) {
-                if (res.success) {
+                if (res.success && res.data && res.data.html) {
                     content.html(res.data.html);
 
-                    // handle klik pagination
+                    // Handle pagination
                     content.find('.pagination a').on('click', function(e) {
                         e.preventDefault();
                         const url = $(this).attr('href');
@@ -111,19 +117,29 @@ $(function() {
                         loadRenstraTable(page);
                     });
                 } else {
-                    content.html('<div class="ui error message"><div class="header">Gagal memuat data</div></div>');
+                    content.html(`
+                        <div class="ui warning message">
+                            <div class="header">Tidak ada data yang tersedia</div>
+                            <p>Silakan tambah data RENSTRA terlebih dahulu.</p>
+                        </div>
+                    `);
                 }
             },
-            error: function() {
-                content.html('<div class="ui error message"><div class="header">Koneksi gagal</div></div>');
+            error: function(xhr, status, error) {
+                content.html(`
+                    <div class="ui error message">
+                        <div class="header">Gagal memuat data</div>
+                        <p>${error}</p>
+                    </div>
+                `);
             },
             complete: function() {
-                loading.hide(); // sembunyikan loading
+                loading.hide(); // <--- INI PASTIKAN SPINNER SELALU BERHENTI
             }
         });
     }
 
-    // Load pertama kali
+    // Load pertama
     loadRenstraTable();
 
     // Tombol Tambah
@@ -134,21 +150,32 @@ $(function() {
         $('#modal-renstra').modal('show');
     });
 
-    // Tombol Batal di modal
+    // Batal
     $('#btn-batal-modal').on('click', () => {
         $('#modal-renstra').modal('hide');
     });
 
-    // Submit form (contoh dasar – nanti ganti dengan AJAX POST ke store)
+    // Submit form dengan validasi Fomantic + AJAX
     $('#form-renstra').on('submit', function(e) {
         e.preventDefault();
 
-        // Validasi sederhana Fomantic
-        if (!$(this).form('validate form')) return;
+        // Validasi Fomantic
+        $(this).form({
+            fields: {
+                kd_sub_keg:      'empty',
+                uraian_prog_keg: 'empty',
+                jumlah:          'empty'
+            },
+            on: 'submit'
+        });
+
+        if (!$(this).form('is valid')) {
+            return;
+        }
 
         const formData = new FormData(this);
-        const method = formData.get('_method') || 'POST';
-        const url = method === 'POST' 
+        const method   = formData.get('_method') || 'POST';
+        const url      = method === 'POST' 
             ? '{{ url("/anggaran/renstra") }}' 
             : '{{ url("/anggaran/renstra") }}/' + formData.get('id');
 
@@ -167,13 +194,13 @@ $(function() {
                     alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
                 }
             },
-            error: function() {
-                alert('Gagal terhubung ke server');
+            error: function(xhr) {
+                alert('Gagal terhubung ke server: ' + (xhr.responseJSON?.message || 'Unknown error'));
             }
         });
     });
 
-    // Inisialisasi Fomantic UI (dropdown, checkbox, dll jika ada)
+    // Inisialisasi Fomantic UI
     $('.ui.dropdown').dropdown();
     $('.ui.checkbox').checkbox();
 });

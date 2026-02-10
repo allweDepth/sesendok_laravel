@@ -36,6 +36,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/renja-dpa',      [AnggaranController::class, 'renjaDpa'])->name('renja-dpa');
         Route::get('/renja-perubahan', [AnggaranController::class, 'renjaPerubahan'])->name('renja-perubahan');
         Route::get('/dppa',           [AnggaranController::class, 'dppa'])->name('dppa');
+        Route::get('/renstra/table', [AnggaranController::class, 'renstraTable'])->name('renstra.table');
     });
 
     // Kontrak

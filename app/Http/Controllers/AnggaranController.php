@@ -39,14 +39,14 @@ class AnggaranController extends Controller
 
                 $items = $query->paginate($perPage, ['*'], 'page', $page);
 
+                // Kirim PAGINATION dan ITEMS ke view partial
+                $pagination = $items->links('vendor.pagination.semantic-ui')->toHtml();
+
                 $data = [
-                    'html'       => view('anggaran.partials._table_renstra', compact('items'))->render(),
-                    'pagination' => $items->links('vendor.pagination.semantic-ui')->toHtml(),
+                    'html'       => view('anggaran.partials._table_renstra', compact('items', 'pagination'))->render(),  // <-- TAMBAH 'pagination' di compact
+                    'pagination' => $pagination,  // <-- ini bisa dihapus kalau tidak dipakai di JS
                     'total'      => number_format($query->sum('jumlah'), 2, ',', '.'),
-                    'debug'      => 'OK - Items count: ' . $items->count() . ' | Tahun: ' . $tahun
                 ];
-            } elseif ($tbl === 'tujuan_sasaran_renstra') {
-                // ... tetap
             }
 
             return response()->json([

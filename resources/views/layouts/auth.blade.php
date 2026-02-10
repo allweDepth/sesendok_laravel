@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,13 +28,22 @@
 
         {{-- SIDEBAR --}}
         @include('layouts.partials.sidebar')
-
+        {{-- ===== STICKY HEADER (GLOBAL, SETELAH LOGIN) ===== --}}
+        @include('layouts.partials.sticky')
         {{-- PUSHER --}}
         <div class="pusher">
-                @yield('main-content')
+            @yield('main-content')
         </div>
 
     </div>
-
+<script>
+$(function () {
+    $('#page-sticky').sticky({
+        context: '.pusher',
+        offset: $('.ui.top.fixed.menu').outerHeight() || 0
+    });
+});
+</script>
 </body>
+
 </html>

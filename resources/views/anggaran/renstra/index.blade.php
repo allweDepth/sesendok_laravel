@@ -99,7 +99,7 @@ $(function() {
 
     function loadRenstraTable(page = 1) {
         console.log("Load page " + page);
-        loading.show();
+        loading.addClass('active');
         content.empty();
 
         $.ajax({
@@ -138,7 +138,7 @@ $(function() {
             },
             complete: function() {
                 console.log("AJAX complete - hide loading");
-                loading.hide(); // PASTI BERHENTI DISINI
+                loading.removeClass('active'); // PASTI BERHENTI DISINI
             }
         });
     }

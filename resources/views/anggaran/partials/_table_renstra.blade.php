@@ -33,8 +33,10 @@
         @endforeach
     </tbody>
     <tfoot>
-        <tr>
-            <th colspan="8">{!! $pagination !!}</th>
-        </tr>
-    </tfoot>
+    <tr>
+        <th colspan="8" class="right aligned">
+            {!! $pagination ?? '<div class="ui info message">Tidak ada pagination</div>' !!}
+        </th>
+    </tr>
+</tfoot>
 </table>

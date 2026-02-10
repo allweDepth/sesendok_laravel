@@ -20,17 +20,17 @@
     </div>
 
     <div id="renstra-table-container" class="ui long scrolling fluid container mt-4">
-        <!-- Loading indicator -->
+        <!-- Loading -->
         <div class="ui active inverted dimmer" id="renstra-loading">
             <div class="ui large text loader">Memuat data RENSTRA...</div>
         </div>
 
-        <!-- Tabel akan dimuat di sini via AJAX -->
+        <!-- Konten tabel -->
         <div id="renstra-table-content"></div>
     </div>
 </div>
 
-<!-- Modal Form -->
+<!-- Modal -->
 <div id="modal-renstra" class="ui modal">
     <div class="header">Form RENSTRA</div>
     <div class="content scrolling">
@@ -52,7 +52,7 @@
             <div class="two fields">
                 <div class="field">
                     <label>Satuan</label>
-                    <input type="text" name="satuan" placeholder="Contoh: Km, Unit, Persen">
+                    <input type="text" name="satuan" placeholder="Km, Unit, Persen">
                 </div>
                 <div class="field">
                     <label>Jumlah (Rp)</label>
@@ -60,7 +60,6 @@
                 </div>
             </div>
 
-            <!-- Field tambahan sesuai tabel -->
             <div class="two fields">
                 <div class="field">
                     <label>Indikator Kinerja</label>
@@ -78,14 +77,12 @@
             </div>
 
             <div class="ui error message" style="display:none;">
-                <div class="header">Mohon periksa kembali isian form</div>
+                <div class="header">Periksa kembali isian</div>
                 <ul class="list"></ul>
             </div>
 
-            <div class="ui buttons">
-                <button type="submit" class="ui positive button">Simpan</button>
-                <button type="button" class="ui button" id="btn-batal-modal">Batal</button>
-            </div>
+            <button type="submit" class="ui positive button">Simpan</button>
+            <button type="button" class="ui button" id="btn-batal-modal">Batal</button>
         </form>
     </div>
 </div>
@@ -94,11 +91,14 @@
 @push('scripts')
 <script>
 $(function() {
+    console.log("Script RENSTRA start");
+
     const container = $('#renstra-table-container');
     const content   = $('#renstra-table-content');
     const loading   = $('#renstra-loading');
 
     function loadRenstraTable(page = 1) {
+        console.log("Load page " + page);
         loading.show();
         content.empty();
 
@@ -106,10 +106,12 @@ $(function() {
             url: '{{ route("anggaran.renstra.table") }}',
             data: { page: page },
             success: function(res) {
+                console.log("AJAX success:", res);
+
                 if (res.success && res.data && res.data.html) {
                     content.html(res.data.html);
 
-                    // Handle pagination
+                    // Pastikan pagination klik jalan
                     content.find('.pagination a').on('click', function(e) {
                         e.preventDefault();
                         const url = $(this).attr('href');
@@ -119,13 +121,14 @@ $(function() {
                 } else {
                     content.html(`
                         <div class="ui warning message">
-                            <div class="header">Tidak ada data yang tersedia</div>
-                            <p>Silakan tambah data RENSTRA terlebih dahulu.</p>
+                            <div class="header">Tidak ada data RENSTRA</div>
+                            <p>Untuk tahun {{ session('tahun', date('Y')) }} belum ada data. Tambah dulu ya.</p>
                         </div>
                     `);
                 }
             },
             error: function(xhr, status, error) {
+                console.error("AJAX error:", status, error);
                 content.html(`
                     <div class="ui error message">
                         <div class="header">Gagal memuat data</div>
@@ -134,7 +137,8 @@ $(function() {
                 `);
             },
             complete: function() {
-                loading.hide(); // <--- INI PASTIKAN SPINNER SELALU BERHENTI
+                console.log("AJAX complete - hide loading");
+                loading.hide(); // PASTI BERHENTI DISINI
             }
         });
     }
@@ -155,23 +159,11 @@ $(function() {
         $('#modal-renstra').modal('hide');
     });
 
-    // Submit form dengan validasi Fomantic + AJAX
+    // Submit form
     $('#form-renstra').on('submit', function(e) {
         e.preventDefault();
 
-        // Validasi Fomantic
-        $(this).form({
-            fields: {
-                kd_sub_keg:      'empty',
-                uraian_prog_keg: 'empty',
-                jumlah:          'empty'
-            },
-            on: 'submit'
-        });
-
-        if (!$(this).form('is valid')) {
-            return;
-        }
+        if (!$(this).form('validate form')) return;
 
         const formData = new FormData(this);
         const method   = formData.get('_method') || 'POST';
@@ -187,20 +179,19 @@ $(function() {
             contentType: false,
             success: function(res) {
                 if (res.success) {
-                    alert(res.message || 'Data berhasil disimpan');
+                    alert(res.message || 'Data tersimpan');
                     $('#modal-renstra').modal('hide');
-                    loadRenstraTable(); // refresh tabel
+                    loadRenstraTable();
                 } else {
-                    alert('Gagal: ' + (res.message || 'Terjadi kesalahan'));
+                    alert('Gagal: ' + (res.message || 'Error'));
                 }
             },
-            error: function(xhr) {
-                alert('Gagal terhubung ke server: ' + (xhr.responseJSON?.message || 'Unknown error'));
+            error: function() {
+                alert('Gagal koneksi server');
             }
         });
     });
 
-    // Inisialisasi Fomantic UI
     $('.ui.dropdown').dropdown();
     $('.ui.checkbox').checkbox();
 });

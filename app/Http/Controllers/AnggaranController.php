@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\RenstraSkpd;           // sesuaikan nama model Anda
 use App\Models\TujuanSasaranRenstra;  // sesuaikan nama model Anda
 
 class AnggaranController extends Controller
 {
+    // AnggaranController.php
     public function renstra()
     {
-        return view('anggaran.renstra');
+        return view('anggaran.renstra.index'); // file: resources/views/anggaran/renstra/index.blade.php
     }
 
     /**
@@ -24,8 +26,8 @@ class AnggaranController extends Controller
 
         // filter sesuai user & tahun (sesuaikan dengan logic Anda)
         $tahun   = session('tahun', date('Y'));
-        $kdWil   = auth()->user()->kd_wilayah ?? '00.00';
-        $kdOpd   = auth()->user()->kd_organisasi ?? '';
+        $kdWil   = Auth::user()?->kd_wilayah ?? '00.00';
+        $kdOpd   = Auth::user()?->kd_organisasi ?? '';
 
         $data = [];
 
@@ -42,8 +44,7 @@ class AnggaranController extends Controller
                 'pagination' => $items->links('vendor.pagination.semantic-ui')->toHtml(),
                 'total'      => number_format($query->sum('jumlah'), 2, ',', '.'),
             ];
-        } 
-        elseif ($tbl === 'tujuan_sasaran_renstra') {
+        } elseif ($tbl === 'tujuan_sasaran_renstra') {
             $query = TujuanSasaranRenstra::where('kd_wilayah', $kdWil)
                 ->where('kd_opd', $kdOpd)
                 ->where('tahun', $tahun)
